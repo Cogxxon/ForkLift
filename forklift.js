@@ -12,7 +12,7 @@
      * @param f
      * @constructor
      */
-    ForkLift.CreateHtmlObjects = function CreateWindowObjects(dimen)
+    ForkLift.CreateHtmlObjects = function(dimen)
     {
         /**
          * starting id = 500
@@ -37,62 +37,79 @@
             window_innder_objects +=    '<div class="clear-fix"></div>';
             window_innder_objects +=    '<div class="content-frame"></div>';
             window_innder_objects += '</div>';
-        /**
+        /***************************
          * Create DOM Element{DIV}
-         * @type {HTMLElement} windowElem */
-        var windowElem = document.createElement('div');
+         * @type {HTMLElement} windowElem 
+         */
+        var masterContainer = document.createElement('div');
 
-        /**
+        /***************************
          * Assigns the classnames
-         * @type {string} windowElem */
+         * @type {string} windowElem 
+         */
         windowElem.className = 'window-size-' + dimen.wSize; windowElem.className += ' window';
 
         /**********************************
-         * if id is not set, genarate one */
+         * if id is not set, genarate one 
+         */
         if ( dimen.hasOwnProperty('id') ) 
         { 
-            windowElem.id = dimen.id; 
+            masterContainer.id = dimen.id; 
         }
         else 
         { 
-            windowElem.id = this.RequestWindowId(); 
+            masterContainer.id = this.rwi(); /*call self request window ID*/
         }
         /**********************************************
          * import the html objects in to container div
-         * @type {string} ****************************/
-        windowElem.innerHTML = window_innder_objects;
+         * @type {string}
+         */
+        masterContainer.innerHTML = window_innder_objects;
 
         /***************************************
          * Append the element to the DOM body */
-        if(document.getElementById(windowElem.id)){
-            /* do nothing */}else{document.body.appendChild(windowElem);
-                                 }
-
+        if( document.getElementById(windowElem.id))
+        {
+            /* do nothing */
+        }
+        else
+        {
+            document.body.appendChild(masterContainer);
+        }
         /*****************************
          *  Make the window daggable */
-        this.MakeDraggable(windowElem);
-
-        /*****************************************************************
-         * Find div with class title and add the custom title text to it */
-        $(windowElem).find('.window-title').html(f.title).show()
-
-        // find .close class element and add a click event listener
-        $(windowElem).find('.close').on('click', function ()
+        if(masterContainer)
         {
-            $(windowElem).toggle(
+            /*if element is present then call MakeDraggable*/
+            this.MakeDraggable(masterContainer);
+            /*****************************************************************
+            * Find div with class title and add the custom title text to it */
+            $(masterContainer).find('.window-title').html(dimen.title).show()
+
+            /* find .close class element and add a click event listener */
+            $(masterContainer).find('.close').on('click', function ()
+            {
+                $(masterContainer).toggle(
                                     "fast",
                                     function ()
                                     {
                                         $(windowElem).remove();
                                     }
                                 );
-        });
-        // add window open close animation
-        $(windowElem).toggle("fast");
+            });
+                // add window open close animation
+            $(masterContainer).toggle("fast");
 
-        $(windowElem).on('click', function () {
-            $(this).css('z-index', window_zIndex++);
-        })
+            $(masterContainer).on(
+                                'click', 
+                                function () {
+                                                $(this).css('z-index', window_zIndex++);
+                                            }
+                            );
+        }/*End If Statement*/
+
+
+
 
 
     }/**End Function::CreateWindowObjects */
@@ -105,7 +122,7 @@
      *
      *
      */
-    ForkLift.RequestWindowId = function()
+    ForkLift.rwi = function()
     {
             // The first window to open
             this.statID += 1;
